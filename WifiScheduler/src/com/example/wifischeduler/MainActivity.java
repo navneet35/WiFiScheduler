@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
 		//DB operations
 		dbOp = new DatabaseOperations(getApplicationContext());
 		dbOp.getWritableDatabase();
-		
+		setTextBox(dbOp.getTime());		
 		
 		schedulerStatusButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			
@@ -115,9 +115,12 @@ public class MainActivity extends Activity {
 	
 	@SuppressLint("NewApi")
 	public void setTextBox(String time){
-		float textSize = 14;
-		if(MainActivity.touch.equalsIgnoreCase(time))
-			 textSize = 55;
+		float textSize = 55;
+		if(MainActivity.touch.equalsIgnoreCase(time)){
+			 textSize = 14;
+			 schedulerStatusButton.setEnabled(false);
+			 schedulerStatusButton.setChecked(false);
+		}
 		showTime.setText(time);
 		showTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);		
 		if(ShowTimePicker.hasJellyBeanAndAbove())
@@ -131,14 +134,15 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		//showVariableStatus("onResume");
-		if(MainActivity.dbOp.getSchedulerState()){
-                 setTextBox(MainActivity.dbOp.getTime()); 			
+		if(dbOp.getSchedulerState()){
 				 scheduleView.setChecked(false);
 				 schedulerStatusButton.setChecked(false);
 				 
 		} else {
 				 scheduleView.setChecked(scheduleView.isChecked());
 		}
+		
+		 setTextBox(dbOp.getTime());
 	}
 
 	public void showToasts(String message, Context context){
