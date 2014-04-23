@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class DatabaseOperations extends SQLiteOpenHelper {
 
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "WiFiScheduler.db";
     private SQLiteDatabase db;
 
@@ -41,29 +41,24 @@ public class DatabaseOperations extends SQLiteOpenHelper {
     }
     
     public boolean getSchedulerState(){
-    	getData();
-    	return WiFiOperations.schedulerStatus;
+    	Cursor cursor = getData();
+    	String status = cursor.getString(cursor.getColumnIndexOrThrow("schedulerStatus"));
+    	if("1".equalsIgnoreCase(status))
+    	  return true;
+    	
+    	return false;
     }
     
     public  String getTime(){
-    	getData();
-    	return WiFiOperations.time;
+    	Cursor cursor = getData();
+    	return cursor.getString(cursor.getColumnIndexOrThrow("time"));
     }
     
-    public void getData(){
+    public Cursor getData(){
        
     	Cursor cursor = getReadableDatabase().rawQuery("select * from scheduler where id = ? ", new String[] {"1"});
 		cursor.moveToFirst();
-		String status = cursor.getString(cursor.getColumnIndexOrThrow("schedulerStatus"));
-		String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
-		 
-		if(status.equalsIgnoreCase("1"))
-			WiFiOperations.schedulerStatus = true;
-		else 
-			WiFiOperations.schedulerStatus = false;
-		
-		WiFiOperations.time = time;
-   
+		return cursor;   
     }
     
     public void updateValues(int status, String time){

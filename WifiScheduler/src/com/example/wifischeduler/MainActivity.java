@@ -92,12 +92,13 @@ public class MainActivity extends Activity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				// TODO Auto-generated method stub
 				if(cancel.isChecked()){
-					if(!touch.equalsIgnoreCase((String) showTime.getText())){
+					if(!touch.equalsIgnoreCase(dbOp.getTime())){
 						WiFiOperations wo = new WiFiOperations();
 						wo.cancelAlarm(getApplicationContext());
 						showTime.setText(touch);
 						showTime.setGravity(Gravity.CENTER);
 						showTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+						WiFiOperations.time = MainActivity.touch;
 						schedulerStatusButton.setChecked(false);
 						schedulerStatusButton.setEnabled(false);
 						cancel.setChecked(false);
@@ -116,12 +117,17 @@ public class MainActivity extends Activity {
 	@SuppressLint("NewApi")
 	public void setTextBox(String time){
 		float textSize = 55;
-		if(MainActivity.touch.equalsIgnoreCase(time)){
+		if(MainActivity.touch.equalsIgnoreCase(time) || time.isEmpty()){
 			 textSize = 14;
+			 WiFiOperations.time = MainActivity.touch;
 			 schedulerStatusButton.setEnabled(false);
 			 schedulerStatusButton.setChecked(false);
+			 showTime.setText(MainActivity.touch);
+		}else{
+			cancelView.setVisibility(View.VISIBLE);
+			showTime.setText(time);
 		}
-		showTime.setText(time);
+		
 		showTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);		
 		if(ShowTimePicker.hasJellyBeanAndAbove())
 		  showTime.setTextAlignment(4);
@@ -135,14 +141,14 @@ public class MainActivity extends Activity {
 		super.onResume();
 		//showVariableStatus("onResume");
 		if(dbOp.getSchedulerState()){
-				 scheduleView.setChecked(false);
-				 schedulerStatusButton.setChecked(false);
+				 scheduleView.setChecked(true);
+				 schedulerStatusButton.setChecked(true);
 				 
 		} else {
 				 scheduleView.setChecked(scheduleView.isChecked());
 		}
 		
-		 setTextBox(dbOp.getTime());
+		setTextBox(dbOp.getTime());
 	}
 
 	public void showToasts(String message, Context context){

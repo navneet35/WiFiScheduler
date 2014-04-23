@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">WiFi Scheduler</string>
+    <string name="app_name">App Scheduler</string>
     <string name="action_settings">Settings</string>
     <string name="scheduler">Scheduler View</string>
     <string name="schedule_status">Scheduler</string>

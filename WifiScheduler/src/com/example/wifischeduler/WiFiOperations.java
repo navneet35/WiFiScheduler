@@ -23,20 +23,9 @@ public class WiFiOperations extends BroadcastReceiver{
 	public static String time = "";
 	
 	public void onReceive(Context context, Intent intent) {
-		DatabaseOperations db = new DatabaseOperations(context);
-		Log.d("BroadCast", "in on receive" + db.getSchedulerState());
-		if(db.getSchedulerState()){
-			Log.d("BroadCast", "after receive");
-			WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-			MainActivity ma = new MainActivity();
-			if(wm.isWifiEnabled()){
-				 wm.setWifiEnabled(false);
-				 ma.showToasts("WiFi disabled", context);
-			 }else{
-				 ma.showToasts("WiFi is already disabled", context);
-			 }
-	    }
-		Log.d("BroadCast", "after on receive");
+		
+		Intent serviceIntent = new Intent(context, WiFiService.class);
+		context.startService(serviceIntent);
     }
 
 	public void setAlarm(Context context){
@@ -49,12 +38,16 @@ public class WiFiOperations extends BroadcastReceiver{
 	  	long sleepTime = (cal.getTimeInMillis() - Calendar.getInstance().getTimeInMillis());
 	  	Log.d("Broadcast", "time set == " + sleepTime);
 	  	alarmMgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + sleepTime, pI);
+	  	if(!MainActivity.touch.equalsIgnoreCase(MainActivity.dbOp.getTime())){
+			MainActivity ma = new MainActivity();
+			ma.showToasts("Schedule Updated", context);
+		}
 	  	changesAfterScheduleSet();
 	}
 	
 	@SuppressLint("NewApi")
 	private void changesAfterScheduleSet(){
-		String time = WiFiOperations.cal.get(Calendar.HOUR_OF_DAY) + ":" + WiFiOperations.cal.get(Calendar.MINUTE);
+		WiFiOperations.time = WiFiOperations.cal.get(Calendar.HOUR_OF_DAY) + ":" + WiFiOperations.cal.get(Calendar.MINUTE);
 	  	MainActivity.dbOp.updateValues(1, time);
 	  	MainActivity wsma = new MainActivity();
 	  	MainActivity.scheduleView.setChecked(false);
@@ -64,7 +57,6 @@ public class WiFiOperations extends BroadcastReceiver{
 	}
 	
 	public void cancelAlarm(Context context){
-	  	MainActivity.dbOp.updateValues(0, MainActivity.touch);
         Intent intent = new Intent(context, WiFiOperations.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
